@@ -14,26 +14,38 @@ type SafeCounter struct {
 
 // Inc increments the counter for the given key.
 func (c *SafeCounter) Inc(key string) {
-	//c.mux.Lock()
+	c.mux.Lock()
 	// Lock so only one goroutine at a time can access the map c.v.
 	c.v[key]++
-	//c.mux.Unlock()
+	c.mux.Unlock()
 }
 
 // Value returns the current value of the counter for the given key.
 func (c *SafeCounter) Value(key string) int {
-	//c.mux.Lock()
+	c.mux.Lock()
 	// Lock so only one goroutine at a time can access the map c.v.
-	//defer c.mux.Unlock()
+	defer c.mux.Unlock()
 	return c.v[key]
 }
 
 func main() {
 	c := SafeCounter{v: make(map[string]int)}
-	for i := 0; i < 1000; i++ {
-		go c.Inc("somekey")
-	}
+    go func() {
+        for i := 0; i < 150; i++ {
+		    c.Inc("/www/example.com/1.jpgi")
+        }
+    }()
+    go func() {
+        for i := 0; i < 150; i++ {
+		    c.Inc("/www/example.com/blog")
+        }
+    }()
+    go func() {
+        for i := 0; i < 150; i++ {
+		c.Inc("/www/example.com/Login")
+    }
+}()
 
 	time.Sleep(time.Second)
-	fmt.Println(c.Value("somekey"))
+	fmt.Println(c.Value("/www/example.com/1.jpgi"))
 }
